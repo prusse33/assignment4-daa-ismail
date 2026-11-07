@@ -1,75 +1,87 @@
 # Assignment 4. Patient Zero
 
-Student ID:
-Name:
-Group:
+**Student ID:** 252357  
+**Name:** Ismail Bolat  
+**Group:** SE-2512
 
-This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment4.pdf`.
+This project implements the five algorithm missions from Assignment 4. The explanations below are drafts to review and rewrite in your own words before submission, as required by the assignment.
 
 ## Program output
 
-The 9 lines your program prints on your data (`java -cp out Main`):
+Run with `java -cp out Main`:
 
-    Mutations:
-    Shared core:
-    Marker hits:
-    First hit:
-    Border length:
-    Shared words:
-    Tests needed:
-    Cheapest testing:
-    Longest chain:
+```text
+Mutations: 65
+Shared core: 1013
+Marker hits: 6
+First hit: 8376
+Border length: 4
+Shared words: 502
+Tests needed: 41
+Cheapest testing: 185
+Longest chain: 32
+```
 
-My outbreak report (a screenshot of `output/outbreak.html`):
+My outbreak report: open `output/outbreak.html` in a browser. After opening it locally, take a screenshot of the page and save it as `output/outbreak.png` (the assignment requires the screenshot in the repository).
 
-![outbreak](output/outbreak.png)
+## Questions — draft answers to review and rewrite
 
-## Questions
+**Mission 1.** `d[i][j]` is the minimum number of edits needed to change the first `i` characters of A into the first `j` characters of B. Each cell takes the minimum of replacing/matching the last characters, deleting a character, or inserting a character; the first row and column represent changing to or from an empty string.
 
-Answer in your own words, two or three sentences each.
+**Mission 2.** A subsequence keeps the same order but may skip characters, while a substring must be continuous. Therefore, the shared core can be longer than the number of characters that match at exactly the same positions: matching characters can be separated by other characters in either strain.
 
-Mission 1. What does the cell d[i][j] of your table mean, and how is it computed from other cells?
+**Mission 3.** The prefix function stores, for each prefix ending at a position, the length of its longest proper prefix that is also a suffix. KMP uses that information after a mismatch, so it shifts the pattern without moving the text pointer backwards. The marker's border length for this ID is **4**, meaning its longest proper prefix that is also a suffix has four characters.
 
-Mission 2. How is the longest common subsequence different from the longest common substring? My Shared core is bigger than the number of letters that are the same at the same place: why?
+**Mission 4.** Equal hashes do not guarantee equal strings because different windows can have the same hash (a collision), so the characters must be checked before counting a match. If many windows share a hash, more character-by-character comparisons are needed and the worst-case running time can grow to O((|A| + |B|) * k).
 
-Mission 3. What does the prefix function tell you, and why does the pointer in the text never go back in KMP? What is the Border length of my marker and what does it mean?
-
-Mission 4. Why must you compare the letters after the hashes are equal? What happens to the cost of Rabin-Karp if many windows have the same hash?
-
-Mission 5. What are the two states of a person in your DP, and how do you get the answer for a person from its children? Why does a greedy "test the person with most links first" not always give the cheapest answer?
+**Mission 5.** For each person there are two DP states: the minimum cost if that person is tested, and the minimum cost if that person is not tested. If a person is not tested, every child must be tested; if the person is tested, each child can use whichever state is cheaper. A greedy choice based only on the number of neighbours ignores the costs and the effect on neighbouring choices, so it can miss the minimum total cost.
 
 ## AI use
 
-The syllabus requires you to say which AI tools you used and for what. Write the tool (ChatGPT, Copilot, other) and what you asked it: explain an idea, find an error, review code. Write "none" if you did not use any. If you took code or text from a book or a website, give the source here.
+ChatGPT was used to explain the assignment, help implement and review the algorithm methods, and help prepare these README explanations. I will review the implementation and rewrite the explanations in my own words so I can explain every part during the defense.
 
 ## Timing (Mission 7)
 
-Milliseconds, average of 3 runs, from `java -cp out Bench`.
+Milliseconds, average of 3 runs from `java -cp out Bench` in the preparation environment. Timings vary by computer and JVM.
 
-| test | size | time |
-|---|---|---|
-| naive search | 20 000 / 40 000 / 80 000 | |
-| KMP | 20 000 / 40 000 / 80 000 | |
-| edit distance | 500 / 1000 / 2000 / 4000 | |
+| test | size | time (ms) |
+|---|---:|---:|
+| naive search | 20 000 | 31.4 |
+| naive search | 40 000 | 77.3 |
+| naive search | 80 000 | 153.1 |
+| KMP | 20 000 | 3.0 |
+| KMP | 40 000 | 2.2 |
+| KMP | 80 000 | 0.5 |
+| edit distance | 500 | 8.4 |
+| edit distance | 1 000 | 10.4 |
+| edit distance | 2 000 | 26.2 |
+| edit distance | 4 000 | 113.9 |
 
-What do the numbers say about how the time grows? When you double the size, by how much does each time grow? Two or three sentences.
+The naive search becomes slower as the text grows, while KMP is linear in the text and pattern lengths; the measured KMP values are small, so JVM and measurement noise make the doubling trend unclear. Edit distance uses a two-dimensional table, so doubling both string lengths makes the number of cells about four times larger; the measurements broadly show this quadratic growth, with some timing noise.
 
 ## Complexity
 
-n is the length of the text (or of a strain), m the length of the pattern, k the length of the window, v the number of people. Fill in every algorithm you wrote.
+Let `n` and `m` be the lengths of the two strains, `t` the genome length, `p` the marker length, `k` the fixed window length (12), and `v` the number of people.
 
 | algorithm | time | space | assumptions |
 |---|---|---|---|
-| Edit distance | | | |
-| LCS | | | |
-| Prefix function and KMP | | | |
-| Rabin-Karp (shared words) | | | |
-| Tree DP | | | |
+| Edit distance | O(nm) | O(nm) | Full DP table |
+| LCS | O(nm) | O(nm) | Full DP table |
+| Prefix function and KMP | O(p + t + h) | O(p + h) | `h` is the number of matches stored in the result |
+| Rabin-Karp (shared words) | Expected O(n + m + k); worst O((n + m)k) | O(m) | Rolling hash; verifies characters for equal hashes; `k` is fixed at 12 in Main |
+| Tree DP | O(v) | O(v) | Tree has `v - 1` edges; iterative traversal and reconstruction |
 
-## Before you submit
+## Checks performed
 
-- The four files in `data` and the screenshot `output/outbreak.png` are in the repository.
-- `java tools/Check.java` shows all examples right.
-- This README is filled in, the program output and the section AI use included.
-- The work is pushed to main (at least one commit per mission) and the repository is public.
-- The link is attached in Moodle.
+- `java tools/Check.java` — tiny, small and dense examples all passed (all 9 output lines in each example).
+- `javac -encoding UTF-8 -d out src/*.java` — compilation successful.
+- `java -cp out Main` — generated the nine output lines above and `output/outbreak.html`.
+- `java -cp out Bench` — timing results recorded above.
+
+## Before submitting
+
+- [ ] Open `output/outbreak.html` and save a screenshot as `output/outbreak.png`.
+- [ ] Review and rewrite the draft answers above in your own words.
+- [ ] Read and understand every method; be ready to explain it in the defense.
+- [ ] Push the project to a public GitHub repository on `main`, with at least one meaningful commit after each mission.
+- [ ] Submit the repository link in Moodle.

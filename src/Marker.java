@@ -89,8 +89,6 @@ public class Marker {
         }
         return count;
     }
-}
-
     private static int value(char c) {
         return switch (c) { case 'A' -> 1; case 'C' -> 2; case 'G' -> 3; case 'T' -> 4; default -> c; };
     }
