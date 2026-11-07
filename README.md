@@ -38,7 +38,7 @@ My outbreak report: open `output/outbreak.html` in a browser. After opening it l
 
 ## AI use
 
-ChatGPT was used to explain the assignment, help implement and review the algorithm methods, and help prepare these README explanations. I will review the implementation and rewrite the explanations in my own words so I can explain every part during the defense.
+ChatGPT was used to explain the assignment, review the algorithm methods, and help prepare these README explanations. I will review the implementation and rewrite the explanations in my own words so I can explain every part during the defense.
 
 ## Timing (Mission 7)
 
